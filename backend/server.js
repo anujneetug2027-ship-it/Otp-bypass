@@ -16,7 +16,7 @@ app.post("/send-otp", async (req, res) => {
     }
 
     const response = await fetch(
-      "https://otp-varification-bice.vercel.app/verify-otp",
+      "https://otp-bypass-1.onrender.com/send-otp",
       {
         method: "POST",
         headers: {
