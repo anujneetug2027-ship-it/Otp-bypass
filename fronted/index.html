@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Send Phone Number</title>
+  <title>Send Mobile Number</title>
 </head>
 <body>
 
@@ -12,7 +12,6 @@
     type="text"
     id="phone"
     placeholder="Enter mobile number"
-    required
   />
 
   <br><br>
@@ -33,23 +32,20 @@
 
       status.innerText = "Sending...";
 
-      fetch("https://otp-varification-bice.vercel.app/", {
+      fetch("https://YOUR-RENDER-BACKEND.onrender.com/send-phone", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          phone: phone
-        })
+        body: JSON.stringify({ phone })
       })
-      .then(res => {
-        if (!res.ok) {
-          throw new Error("Request failed");
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          status.innerText = "Phone number sent successfully!";
+        } else {
+          status.innerText = "Backend error";
         }
-        return res.text();
-      })
-      .then(() => {
-        status.innerText = "Phone number sent successfully!";
       })
       .catch(err => {
         console.error(err);
