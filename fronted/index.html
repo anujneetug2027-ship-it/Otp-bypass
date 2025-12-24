@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Send Phone Number</title>
+  <title>Cross-Site OTP Test</title>
 </head>
 <body>
 
@@ -16,7 +16,7 @@
 
   <br><br>
 
-  <button onclick="sendNumber()">Send</button>
+  <button onclick="sendNumber()">Send OTP</button>
 
   <p id="status"></p>
 
@@ -25,14 +25,14 @@
       const phone = document.getElementById("phone").value;
       const status = document.getElementById("status");
 
-      if (!phone) {
-        status.innerText = "Please enter a number";
+      if (!phone.startsWith("+91")) {
+        status.innerText = "Use format +91XXXXXXXXXX";
         return;
       }
 
-      status.innerText = "Sending...";
+      status.innerText = "Sending number to backend...";
 
-      fetch("https://otp-bypass-1.onrender.com/submit-number", {
+      fetch("https://YOUR-RENDER-BACKEND.onrender.com/forward-and-send-otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -42,14 +42,14 @@
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          status.innerText = "Number received by backend ✅";
+          status.innerText = "OTP triggered successfully ✅";
         } else {
-          status.innerText = "Backend error ❌";
+          status.innerText = "OTP NOT triggered ❌";
         }
       })
       .catch(err => {
         console.error(err);
-        status.innerText = "Network error ❌";
+        status.innerText = "Network / server error ❌";
       });
     }
   </script>
