@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-import fetch from "node-fetch";
 
 const app = express();
 
@@ -13,10 +12,9 @@ app.get("/", (req, res) => {
 });
 
 /*
-  This route:
-  1. Receives phone from Site-A
-  2. Forwards it to your SCHOOL project /send-otp
-  3. Returns success ONLY if Twilio was triggered
+  Receives phone number from Site-A
+  Forwards it to SCHOOL project /send-otp
+  OTP WILL TRIGGER if number reached successfully
 */
 app.post("/forward-and-send-otp", async (req, res) => {
   const { phone } = req.body;
@@ -26,6 +24,7 @@ app.post("/forward-and-send-otp", async (req, res) => {
   }
 
   try {
+    // ✅ USE NATIVE FETCH (Node 18+)
     const response = await fetch(
       "https://otp-varification-bice.vercel.app/send-otp",
       {
@@ -47,7 +46,7 @@ app.post("/forward-and-send-otp", async (req, res) => {
     }
 
   } catch (err) {
-    console.error("Forwarding error:", err);
+    console.error("Proxy error:", err);
     return res.json({ success: false });
   }
 });
