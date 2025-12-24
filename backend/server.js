@@ -6,40 +6,33 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Health check
-app.get("/", (req, res) => {
-  res.json({ ok: true, message: "Proxy backend running" });
-});
-
-/*
-  Receives phone number from Site-A
-  Forwards it to SCHOOL project /send-otp
-  OTP WILL TRIGGER if number reached successfully
-*/
 app.post("/forward-and-send-otp", async (req, res) => {
   const { phone } = req.body;
 
-  if (!phone || !phone.startsWith("+91")) {
-    return res.json({ success: false, message: "Invalid phone format" });
-  }
-
   try {
-    // ✅ USE NATIVE FETCH (Node 18+)
     const response = await fetch(
       "https://otp-varification-bice.vercel.app/send-otp",
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone })
       }
     );
 
-    const data = await response.json();
-    console.log("School backend response:", data);
+    const rawText = await response.text();
+    console.log("Raw response from school site:", rawText);
 
-    if (response.ok && data.success) {
+    // If response is HTML, OTP route is not public
+    if (!rawText.trim().startsWith("{")) {
+      return res.json({
+        success: false,
+        reason: "OTP endpoint is not publicly accessible"
+      });
+    }
+
+    const data = JSON.parse(rawText);
+
+    if (data.success) {
       return res.json({ success: true });
     } else {
       return res.json({ success: false });
@@ -47,11 +40,11 @@ app.post("/forward-and-send-otp", async (req, res) => {
 
   } catch (err) {
     console.error("Proxy error:", err);
-    return res.json({ success: false });
+    return res.json({ success: false, error: "Proxy failed" });
   }
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log("🚀 Proxy backend running on port", PORT);
+  console.log("🚀 Proxy backend running");
 });
