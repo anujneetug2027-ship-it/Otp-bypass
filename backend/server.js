@@ -1,51 +1,35 @@
-const express = require("express");
-const fetch = require("node-fetch");
-const cors = require("cors");
+
+import express from "express";
+import cors from "cors";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-app.post("/send-otp", async (req, res) => {
-  try {
-    const { phone } = req.body;
+// health check
+app.get("/", (req, res) => {
+  res.json({ ok: true, message: "Backend running" });
+});
 
-    if (!phone || !phone.startsWith("+91")) {
-      return res.status(400).json({ success: false, error: "Invalid phone format" });
-    }
+// receive phone number
+app.post("/submit-number", (req, res) => {
+  const { phone } = req.body;
 
-    const response = await fetch(
-      "https://otp-bypass-1.onrender.com/send-otp",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ phone })
-      }
-    );
+  console.log("📞 Phone number received:", phone);
 
-    const text = await response.text();
-    console.log("School backend response:", text);
-
-    if (!response.ok) {
-      return res.status(500).json({
-        success: false,
-        error: "School backend rejected request"
-      });
-    }
-
-    // If Twilio works, backend usually responds with success message
-    return res.json({ success: true });
-
-  } catch (err) {
-    console.error("Proxy error:", err);
-    return res.status(500).json({ success: false });
+  if (!phone) {
+    return res.json({ success: false });
   }
+
+  // just confirming receipt
+  return res.json({
+    success: true,
+    received: phone
+  });
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log("OTP proxy backend running on port", PORT);
+  console.log("🚀 Server running on port", PORT);
 });
